@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, AndroidMapsActivity!</string>
+    <string name="app_name">AndroidMaps</string>
+ 	<string name="mapskey">0FbGCzpYNP5T74mW5eNbvz_Q7KkthL6JANyn7Xw</string>
+
+</resources>
