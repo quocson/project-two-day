@@ -1,17 +1,8 @@
 package android.maps;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
-
-import android.location.Address;
-import android.location.Geocoder;
 import android.os.Bundle;
 import android.view.KeyEvent;
-import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
 
-import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
