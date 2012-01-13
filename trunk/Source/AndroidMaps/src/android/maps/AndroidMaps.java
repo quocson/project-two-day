@@ -128,7 +128,7 @@ public class AndroidMaps extends MapActivity  {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.layout.checkable_menu, menu);
+        inflater.inflate(R.layout.mainmenu, menu);
         return true;
     }
     @Override
@@ -140,6 +140,12 @@ public class AndroidMaps extends MapActivity  {
         return true;
       case R.id.traffic:
           mapView.setSatellite(false);
+        return true;
+      case R.id.exit:
+          mapView.setSatellite(false);
+        return true;
+      case R.id.mylocation:
+    	  
         return true;
       default:
           return super.onOptionsItemSelected(item);
@@ -154,12 +160,6 @@ public class AndroidMaps extends MapActivity  {
                 break;
         case KeyEvent.KEYCODE_O:
         	mapController.zoomOut();
-                break;
-        case KeyEvent.KEYCODE_S:
-            mapView.setSatellite(true);
-                break;
-        case KeyEvent.KEYCODE_M:
-            mapView.setSatellite(false);
                 break;
         }
         return super.onKeyDown(keyCode, event);
