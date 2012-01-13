@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -33,6 +34,7 @@ import com.google.android.maps.Projection;
 
 public class AndroidMaps extends MapActivity  {
 
+	public final static int CHECK_INSTANT_SEARCH = 1;
     private MapView mapView;
     private MapController mapController;
     private GeoPoint searchPoint;
@@ -42,7 +44,7 @@ public class AndroidMaps extends MapActivity  {
     private MyPositionOverlay myPositionOverlay;
     private LocationManager locationManager;
     private Criteria criteria;
-
+    private boolean instant;
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,7 +53,7 @@ public class AndroidMaps extends MapActivity  {
         
         mapView = (MapView)findViewById(R.id.mapView);
         mapController = mapView.getController();
-        
+        instant = true;
 		mapController.setZoom(15);
 		
         mapView.setBuiltInZoomControls(true);
@@ -85,13 +87,28 @@ public class AndroidMaps extends MapActivity  {
 			
 			public boolean onQueryTextSubmit(String query) {
 
-				return false;
+				Geocoder gc = new Geocoder(mapView.getContext());
+				try {
+		            List<Address> addresses = gc.getFromLocationName(
+		                query, 5);
+		            if (addresses.size() > 0) {
+		                searchPoint = new GeoPoint(
+		                        (int) (addresses.get(0).getLatitude() * 1E6), 
+		                        (int) (addresses.get(0).getLongitude() * 1E6));
+		            }    
+		        } catch (IOException e) {
+		            e.printStackTrace();
+		       }
+
+				mapView.getController().animateTo(searchPoint);
+				return true;
 				
 			}
 			
 			public boolean onQueryTextChange(String newText) {
 
-				
+				if(!instant)
+					return true;
 				Geocoder gc = new Geocoder(mapView.getContext());
 				try {
 		            List<Address> addresses = gc.getFromLocationName(
@@ -182,6 +199,15 @@ public class AndroidMaps extends MapActivity  {
       case R.id.exit:
     	  System.exit(0);
         return true;
+      case R.id.option:
+      {
+    	  Intent intent = new Intent(this, Option.class); 
+    	  Bundle bundle = new Bundle();
+    	  bundle.putBoolean("Instant", instant);
+    	  intent.putExtras(bundle);
+    	  startActivityForResult(intent, CHECK_INSTANT_SEARCH); 
+      }
+        return true;
       case R.id.mylocation:
           location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
           updateWithNewLocation(location);
@@ -203,7 +229,14 @@ public class AndroidMaps extends MapActivity  {
           return super.onOptionsItemSelected(item);
       }
     }
-
+    @Override 
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) { 
+        // If the request went well (OK) and the request was PICK_CONTACT_REQUEST 
+        if (resultCode == Activity.RESULT_OK && requestCode == CHECK_INSTANT_SEARCH) {
+        	instant = data.getExtras().getBoolean("Instant");
+        }
+        
+    }
     
     public class MyPositionOverlay extends Overlay {
     	  @Override
