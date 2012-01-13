@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:columnCount="2" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_column="0"
+            android:layout_columnSpan="2"
+            android:layout_gravity="center_horizontal"
+            android:layout_row="1"
+            android:text="@string/help"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="262dp"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_gravity="left"
+            android:layout_row="3"
+            android:text="To find place: type name or address of that place to the search view in the top of the sreeen."
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="271dp"
+            android:layout_column="1"
+            android:layout_gravity="left"
+            android:layout_row="5"
+            android:text="To change style of map: Press MENU button. Select Map Style then Select which style you want to see"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_column="1"
+            android:layout_gravity="left"
+            android:layout_row="8"
+            android:text="Press BACK button to return Maps Sreen"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <Space
+            android:layout_width="1dp"
+            android:layout_height="21dp"
+            android:layout_column="0"
+            android:layout_gravity="fill_horizontal"
+            android:layout_row="0" />
+
+        <Space
+            android:layout_width="21dp"
+            android:layout_height="1dp"
+            android:layout_column="0"
+            android:layout_gravity="fill_horizontal"
+            android:layout_row="0" />
+
+        <Space
+            android:layout_width="1dp"
+            android:layout_height="10dp"
+            android:layout_column="0"
+            android:layout_gravity="fill_horizontal"
+            android:layout_row="2" />
+
+        <Space
+            android:layout_width="1dp"
+            android:layout_height="10dp"
+            android:layout_column="0"
+            android:layout_gravity="fill_horizontal"
+            android:layout_row="4" />
+
+        <Space
+            android:layout_width="1dp"
+            android:layout_height="73dp"
+            android:layout_column="0"
+            android:layout_gravity="fill_horizontal"
+            android:layout_row="5" />
+
+        <Space
+            android:layout_width="1dp"
+            android:layout_height="53dp"
+            android:layout_column="0"
+            android:layout_gravity="fill_horizontal"
+            android:layout_row="6" />
+
+        <Space
+            android:layout_width="1dp"
+            android:layout_height="101dp"
+            android:layout_column="0"
+            android:layout_gravity="fill_horizontal"
+            android:layout_row="7" />
+
+        <Space
+            android:layout_width="1dp"
+            android:layout_height="91dp"
+            android:layout_column="0"
+            android:layout_gravity="fill_horizontal"
+            android:layout_row="8" />
+
+    </GridLayout>

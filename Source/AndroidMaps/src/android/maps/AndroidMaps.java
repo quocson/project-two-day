@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Locale;
 
 import android.R.string;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -146,7 +148,19 @@ public class AndroidMaps extends MapActivity  {
         return true;
       case R.id.mylocation:
     	  
-        return true;
+          return true;
+      case R.id.about:
+      {
+    	  Intent i = new Intent(this, About.class);
+          startActivity(i);
+      }
+          return true;
+      case R.id.help:
+      {
+    	  Intent i = new Intent(this, Help.class);
+          startActivity(i);
+      }
+          return true;
       default:
           return super.onOptionsItemSelected(item);
       }

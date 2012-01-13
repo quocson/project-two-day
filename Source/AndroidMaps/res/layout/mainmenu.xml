@@ -11,6 +11,10 @@
     </item>
     <item android:id="@+id/mylocation"
           android:title="@string/mylocation" />          
+    <item android:id="@+id/about"
+          android:title="@string/about" />
+    <item android:id="@+id/help"
+          android:title="@string/help" />
     <item android:id="@+id/exit"
           android:title="@string/exit" />
 </menu>
