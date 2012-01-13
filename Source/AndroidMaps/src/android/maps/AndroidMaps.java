@@ -154,8 +154,7 @@ public class AndroidMaps extends MapActivity  {
 	                (int) (Double.parseDouble(lngLat[1]) * 1E6), (int) (Double
 	                        .parseDouble(lngLat[0]) * 1E6));
 
-	        myPoint = startGP;
-	        mapController.setCenter(this.myPoint);
+	        mapController.setCenter(startGP);
 	        mapController.setZoom(15);
 	        mapView.getOverlays().add(new DirectionPathOverlay(startGP, startGP));
 
@@ -279,7 +278,16 @@ public class AndroidMaps extends MapActivity  {
           return true;
       case R.id.getdirection:
       {
+    	  Bundle bundle = new Bundle();
     	  Intent intent = new Intent(this, GetDirection.class); 
+    	  if(myPoint != null)
+    	  {
+    	  bundle.putString("mine", getPlace(myPoint));
+    	  bundle.putBoolean("enable", true);
+    	  }
+    	  else 
+    		  bundle.putBoolean("enable", false);
+    	  intent.putExtras(bundle);
     	  startActivityForResult(intent, GET_DIRECTION); 
       }
           return true;
@@ -386,6 +394,31 @@ public class AndroidMaps extends MapActivity  {
                 return false;
         }        
     } 
+    private String getPlace(GeoPoint p)
+    {
+
+        String add = "";      
+        Geocoder geoCoder = new Geocoder(
+                getBaseContext(), Locale.getDefault());
+            try {
+                List<Address> addresses = geoCoder.getFromLocation(
+                    p.getLatitudeE6()  / 1E6, 
+                    p.getLongitudeE6() / 1E6, 1);
+
+                if (addresses.size() > 0) 
+                {
+                    for (int i=0; i<addresses.get(0).getMaxAddressLineIndex(); 
+                         i++)
+                       add += addresses.get(0).getAddressLine(i) + "\n";
+                        add += addresses.get(0).getCountryName() + "\n";
+                }
+                
+            }
+            catch (IOException e) {                
+                e.printStackTrace();
+            }   
+            return add;
+    }
     private GeoPoint getPoint(String name)
     {
     	GeoPoint res = null;
