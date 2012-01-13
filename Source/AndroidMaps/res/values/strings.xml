@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="hello">Hello World, AndroidMapsActivity!</string>
     <string name="app_name">AndroidMaps</string>
- 	<string name="mapskey">0M6-naNRZA6Hzb6mxCydXbccPoBzYDMQEAHU4rQ</string>
  	<string name="mapstyle">Map Style</string>
  	<string name="satellite">Satellite</string>
  	<string name="traffic">Traffic</string>

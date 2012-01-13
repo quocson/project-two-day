@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-import android.R.string;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -13,20 +11,16 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.location.Address;
+import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.view.View;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -35,93 +29,135 @@ import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
+import com.google.android.maps.Projection;
 
 public class AndroidMaps extends MapActivity  {
 
     private MapView mapView;
     private MapController mapController;
-    private GeoPoint point;
-
+    private GeoPoint searchPoint;
+    private GeoPoint myPoint;
+    private Location location;
+    private MapOverlay mapOverlay;
+    private MyPositionOverlay myPositionOverlay;
     private LocationManager locationManager;
-    
+    private Criteria criteria;
+
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);        
         
-		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
-				0, new GeoUpdateHandler());
-        
         mapView = (MapView)findViewById(R.id.mapView);
-        
-        mapView.setBuiltInZoomControls(true);
         mapController = mapView.getController();
-		mapController.setZoom(12);
+        
+		mapController.setZoom(15);
+		
+        mapView.setBuiltInZoomControls(true);
         mapView.displayZoomControls(true);
         mapView.setSatellite(false);
-        /*String coordinates[] = {"21.036074","105.833636"};
-        double lat = Double.parseDouble(coordinates[0]);
-        double lng = Double.parseDouble(coordinates[1]);
- 
-        point = new GeoPoint(
-            (int) (lat * 1E6), 
-            (int) (lng * 1E6));*/
+
+        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
         
-        Geocoder geoCoder = new Geocoder(this, Locale.getDefault());    
-        try {
-        	//tim dia diem
-            List<Address> addresses = geoCoder.getFromLocationName(
-                "Tien Giang", 5);
-            String add = "";
-            if (addresses.size() > 0) {
-                point = new GeoPoint(
-                        (int) (addresses.get(0).getLatitude() * 1E6), 
-                        (int) (addresses.get(0).getLongitude() * 1E6));
-            }    
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        mapController.animateTo(point); 
-        MapOverlay mapOverlay = new MapOverlay();
-        List<Overlay> listOfOverlays = mapView.getOverlays();
-        listOfOverlays.clear();
-        listOfOverlays.add(mapOverlay);  
-        mapView.invalidate();
+        criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        criteria.setAltitudeRequired(false);
+        criteria.setBearingRequired(false);
+        criteria.setCostAllowed(true);
+        criteria.setPowerRequirement(Criteria.POWER_LOW);
+        location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
+        updateWithNewLocation(location);
+        locationManager.requestLocationUpdates(locationManager.getBestProvider(criteria, true), 2000, 10,   
+                                               locationListener);
+        myPositionOverlay = new MyPositionOverlay();
+        List<Overlay> overlays = mapView.getOverlays();
+        overlays.add(myPositionOverlay);	
+        
+        mapOverlay = new MapOverlay();
+        overlays.add(mapOverlay);  
+        
+        mapView.invalidate();    
+        
+        
         SearchView searchView1 = (SearchView) this.findViewById(R.id.searchView1);
         searchView1.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			
 			public boolean onQueryTextSubmit(String query) {
-				// TODO Auto-generated method stub
 
 				return false;
 				
 			}
 			
 			public boolean onQueryTextChange(String newText) {
-				// TODO Auto-generated method stub
+
+				
 				Geocoder gc = new Geocoder(mapView.getContext());
 				try {
-		        	//tim dia diem
 		            List<Address> addresses = gc.getFromLocationName(
 		                newText, 5);
 		            if (addresses.size() > 0) {
-		                point = new GeoPoint(
+		                searchPoint = new GeoPoint(
 		                        (int) (addresses.get(0).getLatitude() * 1E6), 
 		                        (int) (addresses.get(0).getLongitude() * 1E6));
 		            }    
 		        } catch (IOException e) {
 		            e.printStackTrace();
 		       }
-				//Toast.makeText(getBaseContext(), point.getLatitudeE6(), Toast.LENGTH_SHORT).show();
-				mapView.getController().animateTo(point);
+
+				mapView.getController().animateTo(searchPoint);
 				return true;
 			}
 		});
 	}
-        
-    
+	  private final LocationListener locationListener = new LocationListener() {
+		    public void onLocationChanged(Location location) {
+		      updateWithNewLocation(location);
+		    }
+		   
+		    public void onProviderDisabled(String provider){
+		      updateWithNewLocation(null);
+		    }
+
+		    public void onProviderEnabled(String provider) {}
+
+		    public void onStatusChanged(String provider, int status, Bundle extras) {}
+		  }; 
+		  
+	private void updateWithNewLocation(Location location) {
+		  String latLongString;
+		  String addressString = "";
+
+		  if (location != null) {
+
+		    Double geoLat = location.getLatitude()*1E6;
+		    Double geoLng = location.getLongitude()*1E6;
+		    myPoint = new GeoPoint(geoLat.intValue(), 
+		                                  geoLng.intValue());
+		    mapController.animateTo(myPoint);
+		    double lat = location.getLatitude();
+		    double lng = location.getLongitude();
+		    latLongString = "\nLatitude: " + lat + "\nLongitude: " + lng;
+		    double latitude = location.getLatitude();
+		    double longitude = location.getLongitude();
+		    Geocoder gc = new Geocoder(this, Locale.getDefault());
+		    try {
+		      List<Address> addresses = gc.getFromLocation(latitude, longitude, 1);
+		      StringBuilder sb = new StringBuilder();
+
+		      if (addresses.size() > 0) {
+		        Address address = addresses.get(0);
+		        for (int i = 0; i < address.getMaxAddressLineIndex(); i++)
+		          sb.append(address.getAddressLine(i)).append("\n");
+		          sb.append(address.getCountryName());
+		      }
+		      addressString = sb.toString();
+		    } catch (IOException e) {}
+		  } else {
+		    latLongString = "No location found";
+		  }
+		  Toast.makeText(getBaseContext(), "Your Current Position is:\n" + addressString + latLongString, Toast.LENGTH_SHORT).show();
+		}
     @Override
     protected boolean isRouteDisplayed() {
 
@@ -144,9 +180,11 @@ public class AndroidMaps extends MapActivity  {
           mapView.setSatellite(false);
         return true;
       case R.id.exit:
-          mapView.setSatellite(false);
+    	  System.exit(0);
         return true;
       case R.id.mylocation:
+          location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
+          updateWithNewLocation(location);
     	  
           return true;
       case R.id.about:
@@ -165,43 +203,36 @@ public class AndroidMaps extends MapActivity  {
           return super.onOptionsItemSelected(item);
       }
     }
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
 
-        switch (keyCode) {
-        case KeyEvent.KEYCODE_I:
-        	mapController.zoomIn();
-                break;
-        case KeyEvent.KEYCODE_O:
-        	mapController.zoomOut();
-                break;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
     
-    public class GeoUpdateHandler implements LocationListener {
+    public class MyPositionOverlay extends Overlay {
+    	  @Override
+    	  public boolean draw(Canvas canvas, MapView mapView, 
+    		        boolean shadow, long when)  {
 
+    		  Projection projection = mapView.getProjection();
+    		  if (shadow == false) {
+    
+    			  if(myPoint != null)
+    			  {
+	    		    Point p = new Point();
+	    		    projection.toPixels(myPoint, p);
+	                Bitmap bmp = BitmapFactory.decodeResource(
+	                        getResources(), R.drawable.mylocation);            
+	                    canvas.drawBitmap(bmp, p.x - 12, p.y - 24, null); 
+    			  }
 
-		public void onLocationChanged(Location location) {
-			int lat = (int) (location.getLatitude() * 1E6);
-			int lng = (int) (location.getLongitude() * 1E6);
-			GeoPoint point = new GeoPoint(lat, lng);
-			mapController.animateTo(point);
-			mapController.setCenter(point);
-		}
-
-
-		public void onProviderDisabled(String provider) {
-		}
-
-
-		public void onProviderEnabled(String provider) {
-		}
-
-
-		public void onStatusChanged(String provider, int status, Bundle extras) {
-		}
-	}
+    		  }
+    		  super.draw(canvas, mapView, shadow);
+    		  return true;
+    	  }
+    		  
+    		  
+    	  @Override
+    	  public boolean onTap(GeoPoint point, MapView mapView) {
+    	    return false;
+    	  }
+    	}
 
     class MapOverlay extends Overlay
     {
@@ -213,12 +244,15 @@ public class AndroidMaps extends MapActivity  {
  
 
             Point screenPts = new Point();
-            mapView.getProjection().toPixels(point, screenPts);
+            if(searchPoint != null)
+            {
+            	mapView.getProjection().toPixels(searchPoint, screenPts);
  
 
-            Bitmap bmp = BitmapFactory.decodeResource(
-                getResources(), R.drawable.pushpin);            
-            canvas.drawBitmap(bmp, screenPts.x, screenPts.y - 24, null);         
+	            Bitmap bmp = BitmapFactory.decodeResource(
+	                getResources(), R.drawable.pushpin);            
+	            canvas.drawBitmap(bmp, screenPts.x, screenPts.y - 24, null); 
+            }
             return true;
         }
         
@@ -243,8 +277,10 @@ public class AndroidMaps extends MapActivity  {
                         for (int i=0; i<addresses.get(0).getMaxAddressLineIndex(); 
                              i++)
                            add += addresses.get(0).getAddressLine(i) + "\n";
+	                        add += addresses.get(0).getCountryName() + "\n";
+	                        add += "Latitude: " + addresses.get(0).getLatitude()
+                        + "\nLongitude: " + addresses.get(0).getLongitude();
                     }
- 
                     Toast.makeText(getBaseContext(), add, Toast.LENGTH_SHORT).show();
                 }
                 catch (IOException e) {                
