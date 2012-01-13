@@ -19,8 +19,10 @@ public class GetDirection extends Activity{
 	        srcPlace = (EditText)this.findViewById(R.id.srcplace);
 	        dstPlace = (EditText)this.findViewById(R.id.dstplace);
 	        bt = (Button)this.findViewById(R.id.button1);
+	        Bundle extras = getIntent().getExtras();
+	        if(extras.getBoolean("enable"))
+	        srcPlace.setText(extras.getString("mine"));
 	        bt.setOnClickListener(new OnClickListener(){
-
 				public void onClick(View arg0) {
 					// TODO Auto-generated method stub
 
