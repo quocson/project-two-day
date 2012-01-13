@@ -3,11 +3,33 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-    
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <SearchView
+            android:id="@+id/searchView1"
+            android:layout_width="130dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.41"
+            android:iconifiedByDefault="false"
+            android:queryHint="Search Maps" >
+        </SearchView>
+
+        <ImageButton
+            android:id="@+id/imageButton1"
+            android:layout_width="51dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_launcher" />
+    </LinearLayout>
+
 	<com.google.android.maps.MapView android:id="@+id/mapView"
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent"
-		android:apiKey="0FbGCzpYNP5T9FHkwRD_csiJitMRmE798wZqimw"
+		android:apiKey="0M6-naNRZA6Hzb6mxCydXbccPoBzYDMQEAHU4rQ"
         android:enabled="true"
 		android:clickable="true" />
 
