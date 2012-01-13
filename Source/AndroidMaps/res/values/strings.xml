@@ -3,6 +3,9 @@
 
     <string name="hello">Hello World, AndroidMapsActivity!</string>
     <string name="app_name">AndroidMaps</string>
- 	<string name="mapskey">0FbGCzpYNP5T74mW5eNbvz_Q7KkthL6JANyn7Xw</string>
+ 	<string name="mapskey">0M6-naNRZA6Hzb6mxCydXbccPoBzYDMQEAHU4rQ</string>
+ 	<string name="mapstyle">Map Style</string>
+ 	<string name="satellite">Satellite</string>
+ 	<string name="traffic">Traffic</string>
 
 </resources>

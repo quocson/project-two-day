@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import android.R.string;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,8 +16,16 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.google.android.maps.GeoPoint;
@@ -44,11 +53,12 @@ public class AndroidMaps extends MapActivity  {
 				0, new GeoUpdateHandler());
         
         mapView = (MapView)findViewById(R.id.mapView);
+        
         mapView.setBuiltInZoomControls(true);
         mapController = mapView.getController();
 		mapController.setZoom(12);
         mapView.displayZoomControls(true);
-
+        mapView.setSatellite(false);
         /*String coordinates[] = {"21.036074","105.833636"};
         double lat = Double.parseDouble(coordinates[0]);
         double lng = Double.parseDouble(coordinates[1]);
@@ -56,6 +66,7 @@ public class AndroidMaps extends MapActivity  {
         point = new GeoPoint(
             (int) (lat * 1E6), 
             (int) (lng * 1E6));*/
+        
         Geocoder geoCoder = new Geocoder(this, Locale.getDefault());    
         try {
         	//tim dia diem
@@ -76,7 +87,36 @@ public class AndroidMaps extends MapActivity  {
         listOfOverlays.clear();
         listOfOverlays.add(mapOverlay);  
         mapView.invalidate();
-        
+        SearchView searchView1 = (SearchView) this.findViewById(R.id.searchView1);
+        searchView1.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+			
+			public boolean onQueryTextSubmit(String query) {
+				// TODO Auto-generated method stub
+
+				return false;
+				
+			}
+			
+			public boolean onQueryTextChange(String newText) {
+				// TODO Auto-generated method stub
+				Geocoder gc = new Geocoder(mapView.getContext());
+				try {
+		        	//tim dia diem
+		            List<Address> addresses = gc.getFromLocationName(
+		                newText, 5);
+		            if (addresses.size() > 0) {
+		                point = new GeoPoint(
+		                        (int) (addresses.get(0).getLatitude() * 1E6), 
+		                        (int) (addresses.get(0).getLongitude() * 1E6));
+		            }    
+		        } catch (IOException e) {
+		            e.printStackTrace();
+		       }
+				//Toast.makeText(getBaseContext(), point.getLatitudeE6(), Toast.LENGTH_SHORT).show();
+				mapView.getController().animateTo(point);
+				return true;
+			}
+		});
 	}
         
     
@@ -85,7 +125,26 @@ public class AndroidMaps extends MapActivity  {
 
         return false;
     }
-    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.layout.checkable_menu, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+      case R.id.satellite:
+          mapView.setSatellite(true);
+        return true;
+      case R.id.traffic:
+          mapView.setSatellite(false);
+        return true;
+      default:
+          return super.onOptionsItemSelected(item);
+      }
+    }
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
