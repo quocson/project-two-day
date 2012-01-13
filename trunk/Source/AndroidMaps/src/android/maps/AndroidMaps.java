@@ -57,7 +57,6 @@ public class AndroidMaps extends MapActivity  {
 		mapController.setZoom(15);
 		
         mapView.setBuiltInZoomControls(true);
-        mapView.displayZoomControls(true);
         mapView.setSatellite(false);
 
         locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
@@ -210,8 +209,7 @@ public class AndroidMaps extends MapActivity  {
         return true;
       case R.id.mylocation:
           location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
-          updateWithNewLocation(location);
-    	  
+          updateWithNewLocation(location);    	  
           return true;
       case R.id.about:
       {
