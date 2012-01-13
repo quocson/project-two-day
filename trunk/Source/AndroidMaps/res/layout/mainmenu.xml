@@ -11,6 +11,8 @@
     </item>
     <item android:id="@+id/mylocation"
           android:title="@string/mylocation" />
+    <item android:id="@+id/getdirection"
+          android:title="@string/getdirection" />
     <item android:id="@+id/option"
           android:title="@string/option" />          
     <item android:id="@+id/about"
