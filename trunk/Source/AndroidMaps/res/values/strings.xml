@@ -9,5 +9,7 @@
  	<string name="traffic">Traffic</string>
  	<string name="mylocation">My Location</string>
  	<string name="exit">Exit</string>
+ 	<string name="about">About</string>
+ 	<string name="help">Help</string>
 
 </resources>
