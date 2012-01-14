@@ -1,4 +1,4 @@
-package android.maps.Processing;
+package android.maps.Screens;
 
 import android.app.Activity;
 import android.content.Intent;

@@ -23,13 +23,13 @@
             android:id="@+id/imageButton1"
             android:layout_width="51dp"
             android:layout_height="48dp"
-            android:src="@drawable/ic_launcher" />
+            android:src="@drawable/buttonicon" />
     </LinearLayout>
 
 	<com.google.android.maps.MapView android:id="@+id/mapView"
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent"
-		android:apiKey="0FbGCzpYNP5T9FHkwRD_csiJitMRmE798wZqimw"
+		android:apiKey="0M6-naNRZA6Hzb6mxCydXbccPoBzYDMQEAHU4rQ"
         android:enabled="true"
 		android:clickable="true" />
 

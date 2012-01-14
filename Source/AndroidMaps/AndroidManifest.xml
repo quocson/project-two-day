@@ -20,16 +20,16 @@
         </activity>
         <activity
             android:label="@string/about"
-            android:name="About" >
+            android:name=".Screens.About" >
             <intent-filter >
-     <action android:name="android.intent.action.VIEW" />
-     <action android:name="android.intent.action.EDIT" />
-     <category android:name="android.intent.category.LAUNCHER" />
+	     <action android:name="android.intent.action.VIEW" />
+	     <action android:name="android.intent.action.EDIT" />
+	     <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:label="@string/help"
-            android:name = ".Help" >
+            android:name = ".Screens.Help" >
             <intent-filter >
 		     <action android:name="android.intent.action.VIEW" />
 		     <action android:name="android.intent.action.EDIT" />
@@ -38,7 +38,7 @@
         </activity>
         <activity
             android:label="@string/option"
-            android:name=".Option" >
+            android:name=".Screens.Option" >
             <intent-filter >
 		     <action android:name="android.intent.action.VIEW" />
 		     <action android:name="android.intent.action.EDIT" />
@@ -47,7 +47,16 @@
         </activity>
         <activity
             android:label="@string/getdirection"
-            android:name=".GetDirection" >
+            android:name=".Screens.GetDirection" >
+            <intent-filter >
+		     <action android:name="android.intent.action.VIEW" />
+		     <action android:name="android.intent.action.EDIT" />
+		     <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:label="@string/weather"
+            android:name=".Screens.Weather" >
             <intent-filter >
 		     <action android:name="android.intent.action.VIEW" />
 		     <action android:name="android.intent.action.EDIT" />
