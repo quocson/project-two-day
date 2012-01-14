@@ -25,16 +25,21 @@ import android.location.LocationManager;
 import android.maps.OverLays.DirectionPathOverlay;
 import android.maps.OverLays.MapOverlay;
 import android.maps.OverLays.MyPositionOverlay;
-import android.maps.Processing.GetDirection;
 import android.maps.Screens.About;
+import android.maps.Screens.GetDirection;
 import android.maps.Screens.Help;
 import android.maps.Screens.Option;
+import android.maps.Screens.Weather;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -69,6 +74,15 @@ public class AndroidMaps extends MapActivity  {
         setContentView(R.layout.main);        
         
         mapView = (MapView)findViewById(R.id.mapView);
+        ImageButton bt = (ImageButton) findViewById(R.id.imageButton1);
+        bt.setOnClickListener(new OnClickListener(){
+
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
+		        updateWithNewLocation(location);    	 
+			}});
+         
         mapController = mapView.getController();
         instant = true;
 		mapController.setZoom(15);
@@ -153,7 +167,8 @@ public class AndroidMaps extends MapActivity  {
 	private void getDirection(String srcPlace, String dstPlace)
 	{
 		 pairs = getDirectionData(srcPlace, dstPlace);
-
+		 if (pairs == null)
+			 return;
 	     String[] lngLat = pairs[0].split(",");
          
 	     GeoPoint gp = new GeoPoint(
@@ -251,10 +266,6 @@ public class AndroidMaps extends MapActivity  {
     	  startActivityForResult(intent, CHECK_INSTANT_SEARCH); 
       }
         return true;
-      case R.id.mylocation:
-          location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
-          updateWithNewLocation(location);    	  
-          return true;
       case R.id.about:
       {
     	  Intent i = new Intent(this, About.class);
@@ -264,6 +275,37 @@ public class AndroidMaps extends MapActivity  {
       case R.id.help:
       {
     	  Intent i = new Intent(this, Help.class);
+          startActivity(i);
+      }
+          return true;
+      case R.id.weather:
+      {
+    	  Intent i = new Intent(this, Weather.class);
+    	  Bundle bundle= new Bundle();
+    	  String add = "";
+    	  Geocoder geoCoder = new Geocoder(
+                  getBaseContext(), Locale.getDefault());
+              try {
+                  List<Address> addresses = geoCoder.getFromLocation(
+                      myPoint.getLatitudeE6()  / 1E6, 
+                      myPoint.getLongitudeE6() / 1E6, 1);
+
+                  if (addresses.size() > 0) 
+                  {
+                     add += addresses.get(0).getAddressLine(addresses.get(0).getMaxAddressLineIndex() - 1) ;
+                  }
+                  
+              }
+              catch (IOException e) {                
+                  e.printStackTrace();
+              }   
+    	  if(myPoint != null)
+    	  {
+	    	  bundle.putBoolean("enable", true);
+	    	  bundle.putString("myplace", add);
+    	  }
+    	  else bundle.putBoolean("enable", false);
+    	  i.putExtras(bundle);
           startActivity(i);
       }
           return true;
@@ -371,7 +413,7 @@ public class AndroidMaps extends MapActivity  {
         } catch (Exception e) {
         	e.printStackTrace();
         }
-
+        if(doc == null) return null;
         NodeList nl = doc.getElementsByTagName("LineString");
         for (int s = 0; s < nl.getLength(); s++) {
             Node rootNode = nl.item(s);
