@@ -129,6 +129,12 @@ public class AndroidMaps extends MapActivity  {
 		                        (int) (addresses.get(0).getLatitude() * 1E6), 
 		                        (int) (addresses.get(0).getLongitude() * 1E6));
 		            }    
+		            else
+		            {
+	        	    	Toast.makeText(getBaseContext(),
+	        				 "Cannot search location", Toast.LENGTH_SHORT).show();
+	        	    	return false;
+		            }
 		        } catch (IOException e) {
 		            e.printStackTrace();
 		       }
@@ -151,6 +157,12 @@ public class AndroidMaps extends MapActivity  {
 		                        (int) (addresses.get(0).getLatitude() * 1E6), 
 		                        (int) (addresses.get(0).getLongitude() * 1E6));
 		            }    
+		            else
+		            {
+	        	    	Toast.makeText(getBaseContext(),
+	        				 "Cannot search location", Toast.LENGTH_SHORT).show();
+	        	    	return false;
+		            }
 		        } catch (IOException e) {
 		            e.printStackTrace();
 		       }
@@ -162,7 +174,6 @@ public class AndroidMaps extends MapActivity  {
         StrictMode.setThreadPolicy(
         		new StrictMode.ThreadPolicy.Builder().detectDiskReads().detectDiskWrites().detectNetwork().penaltyLog().build());
 	}
-	
 	
 	private void getDirection(String srcPlace, String dstPlace)
 	{
@@ -182,7 +193,6 @@ public class AndroidMaps extends MapActivity  {
 	     mapView.getController().animateTo(gp);
 	     mapController.setZoom(12);
 	}
-	
 	
 	private final LocationListener locationListener = new LocationListener() {
 	    public void onLocationChanged(Location location) {
@@ -233,22 +243,19 @@ public class AndroidMaps extends MapActivity  {
 		  Toast.makeText(getBaseContext(), "Your Current Position is:\n" + addressString + latLongString, Toast.LENGTH_SHORT).show();
 	}
 	
-	
     @Override
     protected boolean isRouteDisplayed() {
 
         return false;
     }
-    
-    
+       
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.layout.mainmenu, menu);
         return true;
     }
-    
-    
+     
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
@@ -334,7 +341,6 @@ public class AndroidMaps extends MapActivity  {
       }
     }
     
-    
     @Override 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) { 
         // If the request went well (OK) and the request was PICK_CONTACT_REQUEST 
@@ -373,7 +379,6 @@ public class AndroidMaps extends MapActivity  {
             return add;
     }
     
-    
     private GeoPoint getPoint(String name)
     {
     	GeoPoint res = null;
@@ -393,7 +398,6 @@ public class AndroidMaps extends MapActivity  {
        }
 		return res;
     }
-    
     
     private String[] getDirectionData(String srcPlace, String destPlace) {
 
