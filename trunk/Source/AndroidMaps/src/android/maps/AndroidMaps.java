@@ -2,7 +2,6 @@ package android.maps;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Locale;
@@ -20,6 +19,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.location.Address;
 import android.location.Criteria;
@@ -57,7 +58,10 @@ public class AndroidMaps extends MapActivity  {
     private MyPositionOverlay myPositionOverlay;
     private LocationManager locationManager;
     private Criteria criteria;
-    private boolean instant;
+    private boolean instant; 
+    private DirectionPathOverlay directionPathOverlay;  
+    private String pairs[] = null;
+    private Projection projection;
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -90,9 +94,11 @@ public class AndroidMaps extends MapActivity  {
         
         mapOverlay = new MapOverlay();
         overlays.add(mapOverlay);  
+
+        directionPathOverlay = new DirectionPathOverlay();
+        mapView.getOverlays().add(directionPathOverlay);
         
         mapView.invalidate();    
-        
         
         
         SearchView searchView1 = (SearchView) this.findViewById(R.id.searchView1);
@@ -146,38 +152,15 @@ public class AndroidMaps extends MapActivity  {
 	}
 	private void getDirection(String srcPlace, String dstPlace)
 	{
-		 String pairs[] = getDirectionData(srcPlace, dstPlace);
-	        String[] lngLat = pairs[0].split(",");
+		 pairs = getDirectionData(srcPlace, dstPlace);
 
-	        // STARTING POINT
-	        GeoPoint startGP = new GeoPoint(
+	     String[] lngLat = pairs[0].split(",");
+         
+	     GeoPoint gp = new GeoPoint(
 	                (int) (Double.parseDouble(lngLat[1]) * 1E6), (int) (Double
 	                        .parseDouble(lngLat[0]) * 1E6));
-
-	        mapController.setCenter(startGP);
-	        mapController.setZoom(15);
-	        mapView.getOverlays().add(new DirectionPathOverlay(startGP, startGP));
-
-	        // NAVIGATE THE PATH
-	        GeoPoint gp1;
-	        GeoPoint gp2 = startGP;
-
-	        for (int i = 1; i < pairs.length; i++) {
-	            lngLat = pairs[i].split(",");
-	            gp1 = gp2;
-	            // watch out! For GeoPoint, first:latitude, second:longitude
-	            gp2 = new GeoPoint((int) (Double.parseDouble(lngLat[1]) * 1E6),
-	                    (int) (Double.parseDouble(lngLat[0]) * 1E6));
-	            mapView.getOverlays().add(new DirectionPathOverlay(gp1, gp2));
-	            Log.d("xxx", "pair:" + pairs[i]);
-	        }
-
-	        // END POINT
-	        mapView.getOverlays().add(new DirectionPathOverlay(gp2, gp2));
-
-	        mapView.getController().animateTo(startGP);
-	        mapView.setBuiltInZoomControls(true);
-	        mapView.displayZoomControls(true);
+	     mapView.getController().animateTo(gp);
+			mapController.setZoom(12);
 	}
 	  private final LocationListener locationListener = new LocationListener() {
 		    public void onLocationChanged(Location location) {
@@ -302,7 +285,7 @@ public class AndroidMaps extends MapActivity  {
         	instant = data.getExtras().getBoolean("Instant");
         }
         if (resultCode == Activity.RESULT_OK && requestCode == GET_DIRECTION) {
-        	 getDirection(data.getExtras().getString("src"), data.getExtras().getString("dst"));        	
+        	 getDirection(data.getExtras().getString("dst"), data.getExtras().getString("src"));        	
         }
         
     }
@@ -312,16 +295,17 @@ public class AndroidMaps extends MapActivity  {
     	  public boolean draw(Canvas canvas, MapView mapView, 
     		        boolean shadow, long when)  {
 
-    		  Projection projection = mapView.getProjection();
+    		  projection = mapView.getProjection();
     		  if (shadow == false) {
-    
+    			  
     			  if(myPoint != null)
+    				  
     			  {
 	    		    Point p = new Point();
 	    		    projection.toPixels(myPoint, p);
 	                Bitmap bmp = BitmapFactory.decodeResource(
 	                        getResources(), R.drawable.mylocation);            
-	                    canvas.drawBitmap(bmp, p.x - 12, p.y - 24, null); 
+	                    canvas.drawBitmap(bmp, p.x - 12, p.y - 32, null); 
     			  }
 
     		  }
@@ -353,7 +337,7 @@ public class AndroidMaps extends MapActivity  {
 
 	            Bitmap bmp = BitmapFactory.decodeResource(
 	                getResources(), R.drawable.pushpin);            
-	            canvas.drawBitmap(bmp, screenPts.x, screenPts.y - 24, null); 
+	            canvas.drawBitmap(bmp, screenPts.x, screenPts.y - 32, null); 
             }
             return true;
         }
@@ -474,6 +458,67 @@ public class AndroidMaps extends MapActivity  {
         }
         String[] tempContent = pathConent.split(" ");
         return tempContent;
+    }
+    
+    public class DirectionPathOverlay extends Overlay {
+
+	    public boolean draw(Canvas canvas, MapView mapView, boolean shadow,
+	            long when) {
+	
+	        projection = mapView.getProjection();
+
+	        if (shadow == false) {
+	        	if(pairs != null)
+	        	{
+
+	    	        String[] lngLat = pairs[0].split(",");
+		            Paint paint = new Paint();
+		            paint.setAntiAlias(true);
+		            paint.setColor(Color.BLUE);
+		            paint.setStrokeWidth(2);
+		            
+	    	        GeoPoint gp1 = new GeoPoint(
+	    	                (int) (Double.parseDouble(lngLat[1]) * 1E6), (int) (Double
+	    	                        .parseDouble(lngLat[0]) * 1E6));
+	    	        
+		            Point p1 = new Point();
+		            Point p2 = new Point();
+		            projection.toPixels(gp1, p1);	            		            
+
+		            Bitmap bmp = BitmapFactory.decodeResource(
+		                getResources(), R.drawable.pushpin);            
+		            canvas.drawBitmap(bmp, p1.x, p1.y - 32, null); 
+
+		            GeoPoint gp2 = gp1;
+		            for (int i = 1; i < pairs.length; i++) {
+			            lngLat = pairs[i].split(",");
+			            gp1 = gp2;
+
+			            gp2 = new GeoPoint((int) (Double.parseDouble(lngLat[1]) * 1E6),
+			                    (int) (Double.parseDouble(lngLat[0]) * 1E6));
+
+			            projection.toPixels(gp1, p1);	
+			            projection.toPixels(gp2, p2);
+			            canvas.drawLine((float) p1.x, (float) p1.y, (float) p2.x,
+			                    (float) p2.y, paint);
+			        }
+
+	
+		            bmp = BitmapFactory.decodeResource(
+		                getResources(), R.drawable.pushpin);            
+		            canvas.drawBitmap(bmp, p2.x, p2.y - 32, null); 
+		            
+	        	}
+	        }
+	        return super.draw(canvas, mapView, shadow, when);
+	    }
+
+    @Override
+	    public void draw(Canvas canvas, MapView mapView, boolean shadow) {
+	        // TODO Auto-generated method stub
+	
+	        super.draw(canvas, mapView, shadow);
+	    }
     }
 }
 
