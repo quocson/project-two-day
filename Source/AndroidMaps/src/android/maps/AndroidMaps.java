@@ -16,25 +16,25 @@ import org.w3c.dom.NodeList;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Point;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.maps.OverLays.DirectionPathOverlay;
+import android.maps.OverLays.MapOverlay;
+import android.maps.OverLays.MyPositionOverlay;
+import android.maps.Processing.GetDirection;
+import android.maps.Screens.About;
+import android.maps.Screens.Help;
+import android.maps.Screens.Option;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -51,8 +51,8 @@ public class AndroidMaps extends MapActivity  {
 	public final static int GET_DIRECTION = 2;
     private MapView mapView;
     private MapController mapController;
-    private GeoPoint searchPoint;
-    private GeoPoint myPoint;
+    public GeoPoint searchPoint;
+    public GeoPoint myPoint;
     private Location location;
     private MapOverlay mapOverlay;
     private MyPositionOverlay myPositionOverlay;
@@ -60,8 +60,8 @@ public class AndroidMaps extends MapActivity  {
     private Criteria criteria;
     private boolean instant; 
     private DirectionPathOverlay directionPathOverlay;  
-    private String pairs[] = null;
-    private Projection projection;
+    public String pairs[] = null;
+    public Projection projection;
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -88,14 +88,14 @@ public class AndroidMaps extends MapActivity  {
         updateWithNewLocation(location);
         locationManager.requestLocationUpdates(locationManager.getBestProvider(criteria, true), 2000, 10,   
                                                locationListener);
-        myPositionOverlay = new MyPositionOverlay();
+        myPositionOverlay = new MyPositionOverlay(this);
         List<Overlay> overlays = mapView.getOverlays();
         overlays.add(myPositionOverlay);	
         
-        mapOverlay = new MapOverlay();
+        mapOverlay = new MapOverlay(this);
         overlays.add(mapOverlay);  
 
-        directionPathOverlay = new DirectionPathOverlay();
+        directionPathOverlay = new DirectionPathOverlay(this);
         mapView.getOverlays().add(directionPathOverlay);
         
         mapView.invalidate();    
@@ -147,9 +147,9 @@ public class AndroidMaps extends MapActivity  {
 		});
         StrictMode.setThreadPolicy(
         		new StrictMode.ThreadPolicy.Builder().detectDiskReads().detectDiskWrites().detectNetwork().penaltyLog().build());
-       
-
 	}
+	
+	
 	private void getDirection(String srcPlace, String dstPlace)
 	{
 		 pairs = getDirectionData(srcPlace, dstPlace);
@@ -160,28 +160,30 @@ public class AndroidMaps extends MapActivity  {
 	                (int) (Double.parseDouble(lngLat[1]) * 1E6), (int) (Double
 	                        .parseDouble(lngLat[0]) * 1E6));
 	     mapView.getController().animateTo(gp);
-			mapController.setZoom(12);
+	     mapController.setZoom(12);
 	}
-	  private final LocationListener locationListener = new LocationListener() {
-		    public void onLocationChanged(Location location) {
-		      updateWithNewLocation(location);
-		    }
-		   
-		    public void onProviderDisabled(String provider){
-		      updateWithNewLocation(null);
-		    }
+	
+	
+	private final LocationListener locationListener = new LocationListener() {
+	    public void onLocationChanged(Location location) {
+	      updateWithNewLocation(location);
+	    }
+	   
+	    public void onProviderDisabled(String provider){
+	      updateWithNewLocation(null);
+	    }
 
-		    public void onProviderEnabled(String provider) {}
+	    public void onProviderEnabled(String provider) {}
 
-		    public void onStatusChanged(String provider, int status, Bundle extras) {}
-		  }; 
+	    public void onStatusChanged(String provider, int status, Bundle extras) {}
+	}; 
 		  
 	private void updateWithNewLocation(Location location) {
 		  String latLongString;
 		  String addressString = "";
-
+	
 		  if (location != null) {
-
+	
 		    Double geoLat = location.getLatitude()*1E6;
 		    Double geoLng = location.getLongitude()*1E6;
 		    myPoint = new GeoPoint(geoLat.intValue(), 
@@ -196,7 +198,7 @@ public class AndroidMaps extends MapActivity  {
 		    try {
 		      List<Address> addresses = gc.getFromLocation(latitude, longitude, 1);
 		      StringBuilder sb = new StringBuilder();
-
+	
 		      if (addresses.size() > 0) {
 		        Address address = addresses.get(0);
 		        for (int i = 0; i < address.getMaxAddressLineIndex(); i++)
@@ -209,18 +211,24 @@ public class AndroidMaps extends MapActivity  {
 		    latLongString = "No location found";
 		  }
 		  Toast.makeText(getBaseContext(), "Your Current Position is:\n" + addressString + latLongString, Toast.LENGTH_SHORT).show();
-		}
+	}
+	
+	
     @Override
     protected boolean isRouteDisplayed() {
 
         return false;
     }
+    
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.layout.mainmenu, menu);
         return true;
     }
+    
+    
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
@@ -278,6 +286,8 @@ public class AndroidMaps extends MapActivity  {
           return super.onOptionsItemSelected(item);
       }
     }
+    
+    
     @Override 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) { 
         // If the request went well (OK) and the request was PICK_CONTACT_REQUEST 
@@ -290,94 +300,6 @@ public class AndroidMaps extends MapActivity  {
         
     }
     
-    public class MyPositionOverlay extends Overlay {
-    	  @Override
-    	  public boolean draw(Canvas canvas, MapView mapView, 
-    		        boolean shadow, long when)  {
-
-    		  projection = mapView.getProjection();
-    		  if (shadow == false) {
-    			  
-    			  if(myPoint != null)
-    				  
-    			  {
-	    		    Point p = new Point();
-	    		    projection.toPixels(myPoint, p);
-	                Bitmap bmp = BitmapFactory.decodeResource(
-	                        getResources(), R.drawable.mylocation);            
-	                    canvas.drawBitmap(bmp, p.x - 12, p.y - 32, null); 
-    			  }
-
-    		  }
-    		  super.draw(canvas, mapView, shadow);
-    		  return true;
-    	  }
-    		  
-    		  
-    	  @Override
-    	  public boolean onTap(GeoPoint point, MapView mapView) {
-    	    return false;
-    	  }
-    	}
-
-    class MapOverlay extends Overlay
-    {
-
-        public boolean draw(Canvas canvas, MapView mapView, 
-        boolean shadow, long when) 
-        {
-            super.draw(canvas, mapView, shadow);                   
- 
-
-            Point screenPts = new Point();
-            if(searchPoint != null)
-            {
-            	mapView.getProjection().toPixels(searchPoint, screenPts);
- 
-
-	            Bitmap bmp = BitmapFactory.decodeResource(
-	                getResources(), R.drawable.pushpin);            
-	            canvas.drawBitmap(bmp, screenPts.x, screenPts.y - 32, null); 
-            }
-            return true;
-        }
-        
-        public boolean onTouchEvent(MotionEvent event, MapView mapView) 
-        {   
-
-            if (event.getAction() == 1) {                
-                GeoPoint p = mapView.getProjection().fromPixels(
-                    (int) event.getX(),
-                    (int) event.getY());
-                    
-            Geocoder geoCoder = new Geocoder(
-                    getBaseContext(), Locale.getDefault());
-                try {
-                    List<Address> addresses = geoCoder.getFromLocation(
-                        p.getLatitudeE6()  / 1E6, 
-                        p.getLongitudeE6() / 1E6, 1);
- 
-                    String add = "";
-                    if (addresses.size() > 0) 
-                    {
-                        for (int i=0; i<addresses.get(0).getMaxAddressLineIndex(); 
-                             i++)
-                           add += addresses.get(0).getAddressLine(i) + "\n";
-	                        add += addresses.get(0).getCountryName() + "\n";
-	                        add += "Latitude: " + addresses.get(0).getLatitude()
-                        + "\nLongitude: " + addresses.get(0).getLongitude();
-                    }
-                    Toast.makeText(getBaseContext(), add, Toast.LENGTH_SHORT).show();
-                }
-                catch (IOException e) {                
-                    e.printStackTrace();
-                }   
-                return true;
-            }
-            else                
-                return false;
-        }        
-    } 
     private String getPlace(GeoPoint p)
     {
 
@@ -403,6 +325,8 @@ public class AndroidMaps extends MapActivity  {
             }   
             return add;
     }
+    
+    
     private GeoPoint getPoint(String name)
     {
     	GeoPoint res = null;
@@ -420,6 +344,8 @@ public class AndroidMaps extends MapActivity  {
        }
 		return res;
     }
+    
+    
     private String[] getDirectionData(String srcPlace, String destPlace) {
 
         String urlString = "http://maps.google.com/maps?f=d&hl=en&saddr="
@@ -458,67 +384,6 @@ public class AndroidMaps extends MapActivity  {
         }
         String[] tempContent = pathConent.split(" ");
         return tempContent;
-    }
-    
-    public class DirectionPathOverlay extends Overlay {
-
-	    public boolean draw(Canvas canvas, MapView mapView, boolean shadow,
-	            long when) {
-	
-	        projection = mapView.getProjection();
-
-	        if (shadow == false) {
-	        	if(pairs != null)
-	        	{
-
-	    	        String[] lngLat = pairs[0].split(",");
-		            Paint paint = new Paint();
-		            paint.setAntiAlias(true);
-		            paint.setColor(Color.BLUE);
-		            paint.setStrokeWidth(2);
-		            
-	    	        GeoPoint gp1 = new GeoPoint(
-	    	                (int) (Double.parseDouble(lngLat[1]) * 1E6), (int) (Double
-	    	                        .parseDouble(lngLat[0]) * 1E6));
-	    	        
-		            Point p1 = new Point();
-		            Point p2 = new Point();
-		            projection.toPixels(gp1, p1);	            		            
-
-		            Bitmap bmp = BitmapFactory.decodeResource(
-		                getResources(), R.drawable.pushpin);            
-		            canvas.drawBitmap(bmp, p1.x, p1.y - 32, null); 
-
-		            GeoPoint gp2 = gp1;
-		            for (int i = 1; i < pairs.length; i++) {
-			            lngLat = pairs[i].split(",");
-			            gp1 = gp2;
-
-			            gp2 = new GeoPoint((int) (Double.parseDouble(lngLat[1]) * 1E6),
-			                    (int) (Double.parseDouble(lngLat[0]) * 1E6));
-
-			            projection.toPixels(gp1, p1);	
-			            projection.toPixels(gp2, p2);
-			            canvas.drawLine((float) p1.x, (float) p1.y, (float) p2.x,
-			                    (float) p2.y, paint);
-			        }
-
-	
-		            bmp = BitmapFactory.decodeResource(
-		                getResources(), R.drawable.pushpin);            
-		            canvas.drawBitmap(bmp, p2.x, p2.y - 32, null); 
-		            
-	        	}
-	        }
-	        return super.draw(canvas, mapView, shadow, when);
-	    }
-
-    @Override
-	    public void draw(Canvas canvas, MapView mapView, boolean shadow) {
-	        // TODO Auto-generated method stub
-	
-	        super.draw(canvas, mapView, shadow);
-	    }
     }
 }
 
