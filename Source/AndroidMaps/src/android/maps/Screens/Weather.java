@@ -28,6 +28,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class Weather extends Activity{
 	private EditText place;
@@ -49,8 +50,8 @@ public class Weather extends Activity{
 	        if(extras.getBoolean("enable"))
 	        {
 	        	place.setText(extras.getString("myplace"));
-	        	if(place.getText() != null)
-	        	getWeather();
+	        	if(place.getText().length() > 0)
+	        		getWeather();
 	        }
 	        bt.setOnClickListener( new OnClickListener(){
 
@@ -58,6 +59,12 @@ public class Weather extends Activity{
 					// TODO Auto-generated method stub
 					if(place.getText().length() > 0)
 			        	getWeather();
+					else
+					{
+				    	Toast.makeText(getBaseContext(),
+							 "Cannot get weather information", Toast.LENGTH_SHORT).show();
+				    	return;
+				    }
 				}
 			});
 	 }
@@ -86,8 +93,19 @@ public class Weather extends Activity{
 	    }
 	    StrictMode.setThreadPolicy(
         		new StrictMode.ThreadPolicy.Builder().detectDiskReads().detectDiskWrites().detectNetwork().penaltyLog().build());
-		
+		if(doc == null)
+		{
+	    	Toast.makeText(getBaseContext(),
+				 "Cannot get weather information", Toast.LENGTH_SHORT).show();
+	    	return;
+	    }
 	    NodeList nl = doc.getElementsByTagName("current_conditions");
+	    if(nl.item(0) == null)
+	    {
+	    	Toast.makeText(getBaseContext(),
+				 "Cannot get weather information", Toast.LENGTH_SHORT).show();
+	    	return;
+	    }
 	    Node rootNode = nl.item(0);
 	    NodeList configItems = rootNode.getChildNodes();
 	    
