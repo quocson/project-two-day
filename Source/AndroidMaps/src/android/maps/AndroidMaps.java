@@ -168,7 +168,12 @@ public class AndroidMaps extends MapActivity  {
 	{
 		 pairs = getDirectionData(srcPlace, dstPlace);
 		 if (pairs == null)
+		 {
+			 Toast.makeText(getBaseContext(),
+					 "Cannot find any direction", Toast.LENGTH_SHORT).show();
 			 return;
+		 }
+			 
 	     String[] lngLat = pairs[0].split(",");
          
 	     GeoPoint gp = new GeoPoint(
@@ -283,6 +288,8 @@ public class AndroidMaps extends MapActivity  {
     	  Intent i = new Intent(this, Weather.class);
     	  Bundle bundle= new Bundle();
     	  String add = "";
+    	  if(myPoint !=null)
+    	  {
     	  Geocoder geoCoder = new Geocoder(
                   getBaseContext(), Locale.getDefault());
               try {
@@ -299,8 +306,6 @@ public class AndroidMaps extends MapActivity  {
               catch (IOException e) {                
                   e.printStackTrace();
               }   
-    	  if(myPoint != null)
-    	  {
 	    	  bundle.putBoolean("enable", true);
 	    	  bundle.putString("myplace", add);
     	  }
@@ -380,7 +385,9 @@ public class AndroidMaps extends MapActivity  {
                 res = new GeoPoint(
                         (int) (addresses.get(0).getLatitude() * 1E6), 
                         (int) (addresses.get(0).getLongitude() * 1E6));
-            }    
+               
+            }  
+            else return null;
         } catch (IOException e) {
             e.printStackTrace();
        }
@@ -390,6 +397,8 @@ public class AndroidMaps extends MapActivity  {
     
     private String[] getDirectionData(String srcPlace, String destPlace) {
 
+    	if(getPoint(srcPlace)  == null||getPoint(destPlace) == null)
+    		return null;
         String urlString = "http://maps.google.com/maps?f=d&hl=en&saddr="
 	                + getPoint(srcPlace).getLatitudeE6()*1.0/1E6 +"," +getPoint(srcPlace).getLongitudeE6()*1.0/1E6 + "&daddr=" +
 	                getPoint(destPlace).getLatitudeE6()*1.0/1E6 +"," +getPoint(destPlace).getLongitudeE6()*1.0/1E6

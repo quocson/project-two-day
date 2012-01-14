@@ -47,13 +47,17 @@ public class Weather extends Activity{
 	        bt = (Button) findViewById(R.id.button1);
 	        Bundle extras = getIntent().getExtras();
 	        if(extras.getBoolean("enable"))
+	        {
 	        	place.setText(extras.getString("myplace"));
-	        getWeather();
+	        	if(place.getText() != null)
+	        	getWeather();
+	        }
 	        bt.setOnClickListener( new OnClickListener(){
 
 				public void onClick(View arg0) {
 					// TODO Auto-generated method stub
-					getWeather();
+					if(place.getText().length() > 0)
+			        	getWeather();
 				}
 			});
 	 }
@@ -101,6 +105,7 @@ public class Weather extends Activity{
 	    image.setImageBitmap(temp);
 	    
 	 }
+	 
 	 
 	 public static Bitmap getBitmapFromURL(String src) {
 		 Bitmap myBitmap = null;
